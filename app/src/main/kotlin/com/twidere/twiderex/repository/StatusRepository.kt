@@ -24,13 +24,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbStatusV2
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
-class StatusRepository(
-    private val database: AppDatabase,
-) {
+class StatusRepository {
+    private val database: AppDatabase by inject()
+
     fun loadLiveDataFromCache(statusKey: MicroBlogKey, accountKey: MicroBlogKey): LiveData<UiStatus?> {
         return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
             it?.toUi(accountKey)

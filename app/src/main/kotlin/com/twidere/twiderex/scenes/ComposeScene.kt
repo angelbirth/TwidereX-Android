@@ -86,7 +86,7 @@ import com.twidere.twiderex.component.foundation.TextInput
 import com.twidere.twiderex.component.status.StatusLineComponent
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.extensions.checkAllSelfPermissionsGranted
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.launcher.AmbientLauncher
@@ -106,6 +106,7 @@ import com.twidere.twiderex.viewmodel.DraftItemViewModel
 import com.twitter.twittertext.TwitterTextConfiguration
 import com.twitter.twittertext.TwitterTextParser
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 
 enum class ComposeType {
     New,
@@ -118,19 +119,14 @@ fun DraftComposeScene(
     draftId: String,
 ) {
     val account = AmbientActiveAccount.current ?: return
-    val draftItemViewModel =
-        assistedViewModel<DraftItemViewModel.AssistedFactory, DraftItemViewModel> {
-            it.create(draftId = draftId)
-        }
+    val draftItemViewModel = viewModel<DraftItemViewModel> {
+        parametersOf(draftId)
+    }
     val data by draftItemViewModel.draft.observeAsState()
     data?.let { draft ->
-        val viewModel =
-            assistedViewModel<DraftComposeViewModel.AssistedFactory, DraftComposeViewModel> {
-                it.create(
-                    account = account,
-                    draft = draft,
-                )
-            }
+        val viewModel = viewModel<DraftComposeViewModel> {
+            parametersOf(account, draft)
+        }
         ComposeBody(viewModel = viewModel, account = account)
     }
 }
@@ -141,8 +137,8 @@ fun ComposeScene(
     composeType: ComposeType = ComposeType.New,
 ) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = assistedViewModel<ComposeViewModel.AssistedFactory, ComposeViewModel> {
-        it.create(account, statusKey, composeType)
+    val viewModel = viewModel<ComposeViewModel> {
+        parametersOf(account, statusKey, composeType)
     }
     ComposeBody(viewModel = viewModel, account = account)
 }

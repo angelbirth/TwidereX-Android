@@ -82,7 +82,7 @@ import com.twidere.twiderex.component.status.ReplyButton
 import com.twidere.twiderex.component.status.RetweetButton
 import com.twidere.twiderex.component.status.ShareButton
 import com.twidere.twiderex.component.status.UserAvatar
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.model.MediaType
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
@@ -95,13 +95,14 @@ import com.twidere.twiderex.ui.AmbientVideoPlayback
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.MediaViewModel
+import org.koin.core.parameter.parametersOf
 import kotlin.math.max
 
 @Composable
 fun MediaScene(statusKey: MicroBlogKey, selectedIndex: Int) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = assistedViewModel<MediaViewModel.AssistedFactory, MediaViewModel> {
-        it.create(account, statusKey)
+    val viewModel = viewModel<MediaViewModel> {
+        parametersOf(account, statusKey)
     }
     val loading by viewModel.loading.observeAsState(initial = false)
     val status by viewModel.status.observeAsState()

@@ -23,22 +23,18 @@ package com.twidere.twiderex.paging.mediator.user
 import androidx.paging.ExperimentalPagingApi
 import com.twidere.services.microblog.TimelineService
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.UserTimelineType
 import com.twidere.twiderex.db.model.pagingKey
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingTimelineMediatorBase
 
 @OptIn(ExperimentalPagingApi::class)
 class UserStatusMediator(
     private val screenName: String,
     private val userKey: MicroBlogKey,
-    database: AppDatabase,
     accountKey: MicroBlogKey,
     private val service: TimelineService,
-    inAppNotification: InAppNotification,
-) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
+) : PagingTimelineMediatorBase(accountKey) {
     override val pagingKey: String
         get() = UserTimelineType.Status.pagingKey(userKey)
 

@@ -42,15 +42,15 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.DraftViewModel
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun DraftListScene() {
-    val viewModel = navViewModel<DraftViewModel>()
+    val viewModel = getViewModel<DraftViewModel>()
     val source by viewModel.source.observeAsState(initial = emptyList())
     val navController = AmbientNavController.current
     TwidereXTheme {

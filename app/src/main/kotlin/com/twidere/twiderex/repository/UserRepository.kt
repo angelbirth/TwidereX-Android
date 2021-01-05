@@ -22,33 +22,24 @@ package com.twidere.twiderex.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbUser
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.model.ui.UiUser.Companion.toUi
 
-class UserRepository @AssistedInject constructor(
-    private val database: AppDatabase,
-    private val accountRepository: AccountRepository,
-    @Assisted private val accountKey: MicroBlogKey,
-    @Assisted private val lookupService: LookupService,
-    @Assisted private val relationshipService: RelationshipService,
+class UserRepository(
+    private val accountKey: MicroBlogKey,
+    private val lookupService: LookupService,
+    private val relationshipService: RelationshipService,
 ) {
 
-    @AssistedInject.Factory
-    interface AssistedFactory {
-        fun create(
-            accountKey: MicroBlogKey,
-            lookupService: LookupService,
-            relationshipService: RelationshipService,
-        ): UserRepository
-    }
+    private val database: AppDatabase by inject()
+    private val accountRepository: AccountRepository by inject()
 
     suspend fun lookupUserByName(name: String): UiUser {
         val user = lookupService.lookupUserByName(name).toDbUser(accountKey)

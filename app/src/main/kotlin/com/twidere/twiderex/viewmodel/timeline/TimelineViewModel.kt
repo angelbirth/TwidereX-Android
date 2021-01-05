@@ -25,14 +25,15 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.paging.mediator.PagingWithGapMediator
 import com.twidere.twiderex.viewmodel.PagingViewModel
 import kotlinx.coroutines.launch
 
-abstract class TimelineViewModel(
-    private val preferences: SharedPreferences,
-) : PagingViewModel() {
+abstract class TimelineViewModel : PagingViewModel() {
+
+    val preferences: SharedPreferences by inject()
 
     abstract override val pagingMediator: PagingWithGapMediator
     abstract val savedStateKey: String
@@ -43,20 +44,30 @@ abstract class TimelineViewModel(
         maxStatusKey: MicroBlogKey,
         sinceStatueKey: MicroBlogKey,
     ) = viewModelScope.launch {
-        pagingMediator.loadBetween(defaultLoadCount, maxStatusKey = maxStatusKey, sinceStatueKey = sinceStatueKey)
+        pagingMediator.loadBetween(
+            defaultLoadCount,
+            maxStatusKey = maxStatusKey,
+            sinceStatueKey = sinceStatueKey
+        )
     }
 
     fun restoreScrollState(): TimelineScrollState {
         return TimelineScrollState(
             firstVisibleItemIndex = preferences.getInt("${savedStateKey}_firstVisibleItemIndex", 0),
-            firstVisibleItemScrollOffset = preferences.getInt("${savedStateKey}_firstVisibleItemScrollOffset", 0),
+            firstVisibleItemScrollOffset = preferences.getInt(
+                "${savedStateKey}_firstVisibleItemScrollOffset",
+                0
+            ),
         )
     }
 
     fun saveScrollState(offset: TimelineScrollState) {
         preferences.edit {
             putInt("${savedStateKey}_firstVisibleItemIndex", offset.firstVisibleItemIndex)
-            putInt("${savedStateKey}_firstVisibleItemScrollOffset", offset.firstVisibleItemScrollOffset)
+            putInt(
+                "${savedStateKey}_firstVisibleItemScrollOffset",
+                offset.firstVisibleItemScrollOffset
+            )
         }
     }
 }

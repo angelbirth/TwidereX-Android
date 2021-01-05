@@ -34,14 +34,12 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.work.WorkManager
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.twitter.TwitterService
 import com.twidere.twiderex.action.ComposeAction
 import com.twidere.twiderex.db.model.DbDraft
-import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.extensions.combineWith
 import com.twidere.twiderex.extensions.getCachedLocation
 import com.twidere.twiderex.model.AccountDetails
@@ -49,48 +47,31 @@ import com.twidere.twiderex.model.ComposeData
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
 import com.twidere.twiderex.repository.DraftRepository
+import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.UserRepository
-import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
 import com.twitter.twittertext.Extractor
+import org.koin.core.parameter.parametersOf
 import java.util.UUID
 
-class DraftItemViewModel @AssistedInject constructor(
-    private val repository: DraftRepository,
-    @Assisted private val draftId: String,
+class DraftItemViewModel(
+    private val draftId: String,
 ) : ViewModel() {
+
+    private val repository: DraftRepository by inject()
 
     val draft = liveData {
         repository.get(draftId)?.let {
             emit(it)
         }
     }
-
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(
-            draftId: String,
-        ): DraftItemViewModel
-    }
 }
 
-class DraftComposeViewModel @AssistedInject constructor(
-    draftRepository: DraftRepository,
-    locationManager: LocationManager,
-    composeAction: ComposeAction,
-    factory: TwitterTweetsRepository.AssistedFactory,
-    userRepositoryFactory: UserRepository.AssistedFactory,
-    workManager: WorkManager,
-    @Assisted account: AccountDetails,
-    @Assisted private val draft: DbDraft,
+class DraftComposeViewModel(
+    account: AccountDetails,
+    draft: DbDraft,
 ) : ComposeViewModel(
-    draftRepository,
-    locationManager,
-    composeAction,
-    factory,
-    userRepositoryFactory,
-    workManager,
     account,
     draft.statusKey,
     draft.composeType,
@@ -103,55 +84,32 @@ class DraftComposeViewModel @AssistedInject constructor(
         putImages(draft.media.map { Uri.parse(it) })
         excludedReplyUserIds.postValue(draft.excludedReplyUserIds ?: emptyList())
     }
-
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(
-            account: AccountDetails,
-            draft: DbDraft,
-        ): DraftComposeViewModel
-    }
 }
 
-open class ComposeViewModel @AssistedInject constructor(
-    protected val draftRepository: DraftRepository,
-    private val locationManager: LocationManager,
-    protected val composeAction: ComposeAction,
-    protected val factory: TwitterTweetsRepository.AssistedFactory,
-    private val userRepositoryFactory: UserRepository.AssistedFactory,
-    private val workManager: WorkManager,
-    @Assisted protected val account: AccountDetails,
-    @Assisted protected val statusKey: MicroBlogKey?,
-    @Assisted val composeType: ComposeType,
+open class ComposeViewModel(
+    protected val account: AccountDetails,
+    protected val statusKey: MicroBlogKey?,
+    val composeType: ComposeType,
 ) : ViewModel(), LocationListener {
-    open val draftId: String = UUID.randomUUID().toString()
 
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(
-            account: AccountDetails,
-            statusKey: MicroBlogKey?,
-            composeType: ComposeType
-        ): ComposeViewModel
-    }
-
-    protected val service by lazy {
-        account.service as TwitterService
-    }
-    protected val repository by lazy {
-        factory.create(
+    protected val draftRepository: DraftRepository by inject()
+    private val locationManager: LocationManager by inject()
+    protected val composeAction: ComposeAction by inject()
+    private val userRepository: UserRepository by inject {
+        parametersOf(
             account.accountKey,
-            account.service as LookupService,
-        )
-    }
-
-    protected val userRepository by lazy {
-        userRepositoryFactory.create(
-            accountKey = account.accountKey,
             account.service as LookupService,
             account.service as RelationshipService,
         )
     }
+    private val workManager: WorkManager by inject()
+
+    open val draftId: String = UUID.randomUUID().toString()
+
+    protected val service by lazy {
+        account.service as TwitterService
+    }
+    protected val statusRepository: StatusRepository by inject()
 
     val location = MutableLiveData<Location?>()
     val excludedReplyUserIds = MutableLiveData<List<String>>(emptyList())
@@ -187,11 +145,12 @@ open class ComposeViewModel @AssistedInject constructor(
     }
     val text = MutableLiveData("")
     val images = MutableLiveData<List<Uri>>(emptyList())
-    val canSaveDraft = text.combineWith(images) { text, imgs -> !text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
+    val canSaveDraft =
+        text.combineWith(images) { text, imgs -> !text.isNullOrEmpty() || !imgs.isNullOrEmpty() }
     val locationEnabled = MutableLiveData(false)
     val status = liveData {
         statusKey?.let {
-            emitSource(repository.loadTweetFromCache(it))
+            emitSource(statusRepository.loadLiveDataFromCache(it, account.accountKey))
         } ?: run {
             emit(null)
         }

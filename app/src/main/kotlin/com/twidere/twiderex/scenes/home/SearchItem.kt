@@ -47,9 +47,10 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchItem : HomeNavigationItem() {
     override val name: String
@@ -68,12 +69,11 @@ class SearchItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current ?: return
-        val viewModel =
-            assistedViewModel<SearchInputViewModel.AssistedFactory, SearchInputViewModel>(
-                account
-            ) {
-                it.create(account = account)
-            }
+        val viewModel = viewModel<SearchInputViewModel>(
+            account
+        ) {
+            parametersOf(account)
+        }
         val source by viewModel.source.observeAsState(initial = emptyList())
         val navigator = AmbientNavigator.current
         InAppNotificationScaffold(

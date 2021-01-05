@@ -21,28 +21,23 @@
 package com.twidere.twiderex.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
 import androidx.datastore.createDataStore
-import com.twidere.twiderex.preferences.proto.AppearancePreferences
-import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.preferences.serializer.AppearancePreferencesSerializer
 import com.twidere.twiderex.preferences.serializer.DisplayPreferencesSerializer
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object PreferenceModule {
-    @Singleton
-    @Provides
-    fun provideAppearances(@ApplicationContext context: Context): DataStore<AppearancePreferences> =
-        context.createDataStore("appearances.pb", AppearancePreferencesSerializer)
-    @Singleton
-    @Provides
-    fun provideDisplay(@ApplicationContext context: Context): DataStore<DisplayPreferences> =
-        context.createDataStore("display.pb", DisplayPreferencesSerializer)
+val preferenceModule = module {
+    single(qualifier = named("appearances")) {
+        get<Context>().createDataStore(
+            "appearances.pb",
+            AppearancePreferencesSerializer
+        )
+    }
+    single(qualifier = named("display")) {
+        get<Context>().createDataStore(
+            "display.pb",
+            DisplayPreferencesSerializer
+        )
+    }
 }

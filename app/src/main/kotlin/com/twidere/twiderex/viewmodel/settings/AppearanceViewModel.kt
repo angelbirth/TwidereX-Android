@@ -21,15 +21,20 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import kotlinx.coroutines.launch
+import org.koin.core.qualifier.named
 
-class AppearanceViewModel @ViewModelInject constructor(
-    private val appearancePreferences: DataStore<AppearancePreferences>
-) : ViewModel() {
+class AppearanceViewModel : ViewModel() {
+    private val appearancePreferences: DataStore<AppearancePreferences> by inject(
+        qualifier = named(
+            "appearances"
+        )
+    )
+
     fun setPrimaryColorIndex(index: Int) = viewModelScope.launch {
         appearancePreferences.updateData {
             it.toBuilder().setPrimaryColorIndex(index).build()

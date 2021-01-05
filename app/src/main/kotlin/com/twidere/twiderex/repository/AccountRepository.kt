@@ -25,14 +25,13 @@ import android.accounts.AccountManager
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.twidere.twiderex.db.model.DbUser
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
 import com.twidere.twiderex.model.cred.CredentialsType
 import com.twidere.twiderex.utils.fromJson
 import com.twidere.twiderex.utils.json
-import javax.inject.Inject
-import javax.inject.Singleton
 
 const val ACCOUNT_TYPE = "com.twidere.twiderex.account"
 private const val ACCOUNT_AUTH_TOKEN_TYPE = "com.twidere.twiderex.account.token"
@@ -47,10 +46,8 @@ private const val ACCOUNT_USER_DATA_POSITION = "position"
 private const val ACCOUNT_USER_DATA_TEST = "test"
 private const val ACCOUNT_USER_DATA_LAST_ACTIVE = "last_active"
 
-@Singleton
-class AccountRepository @Inject constructor(
-    private val manager: AccountManager,
-) {
+class AccountRepository {
+    private val manager: AccountManager by inject()
     val activeAccount =
         MutableLiveData<AccountDetails?>(if (hasAccount()) getCurrentAccount() else null)
 

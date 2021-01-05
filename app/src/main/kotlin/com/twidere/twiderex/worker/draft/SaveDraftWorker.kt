@@ -21,8 +21,6 @@
 package com.twidere.twiderex.worker.draft
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -31,9 +29,9 @@ import com.twidere.twiderex.model.toComposeData
 import com.twidere.twiderex.model.toWorkData
 import com.twidere.twiderex.repository.DraftRepository
 
-class SaveDraftWorker @WorkerInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class SaveDraftWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val repository: DraftRepository,
 ) : CoroutineWorker(context, workerParams) {
 

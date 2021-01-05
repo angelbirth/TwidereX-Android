@@ -22,15 +22,13 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbDraft
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.scenes.ComposeType
 import java.util.UUID
-import javax.inject.Singleton
 
-@Singleton
-class DraftRepository(
-    private val database: AppDatabase
-) {
+class DraftRepository {
+    private val database: AppDatabase by inject()
     val source by lazy {
         database.draftDao().getAll()
     }

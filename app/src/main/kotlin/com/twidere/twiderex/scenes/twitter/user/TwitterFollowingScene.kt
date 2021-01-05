@@ -28,22 +28,23 @@ import com.twidere.twiderex.component.UserListComponent
 import com.twidere.twiderex.component.foundation.AppBar
 import com.twidere.twiderex.component.foundation.AppBarNavigationButton
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.extensions.viewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.twitter.user.FollowingViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TwitterFollowingScene(
     userKey: MicroBlogKey,
 ) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = viewModel(
+    val viewModel = viewModel<FollowingViewModel>(
         account,
         userKey,
     ) {
-        FollowingViewModel(account, userKey)
+        parametersOf(account, userKey)
     }
     TwidereXTheme {
         InAppNotificationScaffold(

@@ -25,34 +25,22 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.SearchService
-import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.search.SearchMediaMediator
 import kotlinx.coroutines.flow.map
 
-class TwitterSearchMediaViewModel @AssistedInject constructor(
-    val database: AppDatabase,
-    inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted keyword: String,
+class TwitterSearchMediaViewModel(
+    private val account: AccountDetails,
+    keyword: String,
 ) : ViewModel() {
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, keyword: String): TwitterSearchMediaViewModel
-    }
-
     private val service by lazy {
         account.service as SearchService
     }
     val source by lazy {
-        SearchMediaMediator(keyword, database, account.accountKey, service, inAppNotification).pager()
+        SearchMediaMediator(keyword, account.accountKey, service).pager()
             .flow.map { it.map { it.status.toUi(account.accountKey) } }.cachedIn(viewModelScope)
             .map {
                 it.flatMap {

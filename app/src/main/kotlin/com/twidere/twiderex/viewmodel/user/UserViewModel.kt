@@ -26,13 +26,11 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.RelationshipService
 import com.twidere.services.microblog.model.IRelationship
-import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiUser
@@ -40,33 +38,22 @@ import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.UserRepository
 import com.twidere.twiderex.utils.show
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import retrofit2.HttpException
 import java.io.IOException
 
-class UserViewModel @AssistedInject constructor(
-    private val factory: UserRepository.AssistedFactory,
-    private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val screenName: String,
-    @Assisted private val host: String,
-    @Assisted private val initialUserKey: MicroBlogKey?,
+class UserViewModel(
+    private val account: AccountDetails,
+    private val screenName: String,
+    private val host: String,
+    private val initialUserKey: MicroBlogKey?,
 ) : ViewModel() {
 
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(
-            account: AccountDetails,
-            screenName: String,
-            host: String,
-            initialUserKey: MicroBlogKey?,
-        ): UserViewModel
+    private val repository: UserRepository by inject {
+        parametersOf(account.accountKey, account.service as LookupService, account.service as RelationshipService)
     }
+    private val inAppNotification: InAppNotification by inject()
 
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as LookupService, it as RelationshipService)
-        }
-    }
     val userKey = MutableLiveData(initialUserKey)
     val refreshing = MutableLiveData(false)
     val loadingRelationship = MutableLiveData(false)

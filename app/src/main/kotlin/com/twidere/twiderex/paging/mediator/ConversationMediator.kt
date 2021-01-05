@@ -25,10 +25,8 @@ import com.twidere.services.microblog.model.IStatus
 import com.twidere.services.twitter.TwitterService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
-import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 
 @OptIn(ExperimentalPagingApi::class)
 class ConversationMediator(
@@ -36,9 +34,7 @@ class ConversationMediator(
     private val statusId: String,
     private val service: TwitterService,
     accountKey: MicroBlogKey,
-    database: AppDatabase,
-    inAppNotification: InAppNotification
-) : PagingTimelineMediatorBase(accountKey, database, inAppNotification) {
+) : PagingTimelineMediatorBase(accountKey) {
     override val pagingKey: String
         get() = "conversation:$conversationId"
     private var nextPage: String? = null

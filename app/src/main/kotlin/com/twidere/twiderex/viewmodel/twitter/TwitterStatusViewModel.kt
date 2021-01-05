@@ -25,41 +25,35 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.microblog.SearchService
 import com.twidere.services.twitter.model.ReferencedTweetType
 import com.twidere.services.twitter.model.StatusV2
-import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.repository.twitter.TwitterConversationRepository
 import com.twidere.twiderex.utils.show
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import retrofit2.HttpException
 import java.io.IOException
 
-class TwitterStatusViewModel @AssistedInject constructor(
-    private val factory: TwitterConversationRepository.AssistedFactory,
-    private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val statusKey: MicroBlogKey,
+class TwitterStatusViewModel(
+    private val account: AccountDetails,
+    private val statusKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, statusKey: MicroBlogKey): TwitterStatusViewModel
-    }
-
     private lateinit var targetTweet: StatusV2
     private var nextPage: String? = null
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as SearchService, it as LookupService)
-        }
+    private val inAppNotification: InAppNotification by inject()
+    private val repository: TwitterConversationRepository by inject {
+        parametersOf(
+            account.accountKey,
+            account.service as SearchService,
+            account.service as LookupService
+        )
     }
 
     val moreConversations = repository.liveData.switchMap { list ->

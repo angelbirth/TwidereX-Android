@@ -20,38 +20,22 @@
  */
 package com.twidere.twiderex.repository.twitter
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.LookupService
 import com.twidere.services.twitter.model.StatusV2
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 
-class TwitterTweetsRepository @AssistedInject constructor(
-    private val database: AppDatabase,
-    @Assisted private val accountKey: MicroBlogKey,
-    @Assisted private val lookupService: LookupService,
+class TwitterTweetsRepository(
+    private val accountKey: MicroBlogKey,
+    private val lookupService: LookupService,
 ) {
-    @AssistedInject.Factory
-    interface AssistedFactory {
-        fun create(
-            accountKey: MicroBlogKey,
-            lookupService: LookupService,
-        ): TwitterTweetsRepository
-    }
-
-    fun loadTweetFromCache(statusKey: MicroBlogKey): LiveData<UiStatus?> {
-        return database.statusDao().findWithStatusIdWithReferenceLiveData(statusKey).map {
-            it?.toUi(accountKey)
-        }
-    }
+    private val database: AppDatabase by inject()
 
     suspend fun loadTweetFromNetwork(statusId: String): UiStatus {
         return toUiStatus(lookupService.lookupStatus(statusId) as StatusV2)

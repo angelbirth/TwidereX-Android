@@ -21,17 +21,15 @@
 package com.twidere.twiderex.worker.draft
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.twidere.twiderex.repository.DraftRepository
 
-class RemoveDraftWorker @WorkerInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class RemoveDraftWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val repository: DraftRepository,
 ) : CoroutineWorker(appContext, params) {
 

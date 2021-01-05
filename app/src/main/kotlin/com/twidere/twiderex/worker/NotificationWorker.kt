@@ -21,16 +21,14 @@
 package com.twidere.twiderex.worker
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.twidere.twiderex.notification.InAppNotification
 
-class NotificationWorker @WorkerInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class NotificationWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val inAppNotification: InAppNotification,
 ) : CoroutineWorker(appContext, params) {
 

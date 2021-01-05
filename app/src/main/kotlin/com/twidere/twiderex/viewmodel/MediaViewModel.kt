@@ -24,40 +24,32 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.LookupService
-import com.twidere.twiderex.di.assisted.IAssistedFactory
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.notification.InAppNotification
+import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.repository.twitter.TwitterTweetsRepository
 import com.twidere.twiderex.utils.show
 import kotlinx.coroutines.launch
+import org.koin.core.parameter.parametersOf
 import retrofit2.HttpException
 import java.io.IOException
 
-class MediaViewModel @AssistedInject constructor(
-    private val factory: TwitterTweetsRepository.AssistedFactory,
-    private val inAppNotification: InAppNotification,
-    @Assisted private val account: AccountDetails,
-    @Assisted private val statusKey: MicroBlogKey,
+class MediaViewModel(
+    private val account: AccountDetails,
+    private val statusKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(account: AccountDetails, statusKey: MicroBlogKey): MediaViewModel
+    private val inAppNotification: InAppNotification by inject()
+    private val repository: TwitterTweetsRepository by inject {
+        parametersOf(account.accountKey, account.service as LookupService)
     }
-
-    private val repository by lazy {
-        account.service.let {
-            factory.create(account.accountKey, it as LookupService)
-        }
-    }
+    private val statusRepository: StatusRepository by inject()
     val loading = MutableLiveData(false)
     val status = liveData {
-        emitSource(repository.loadTweetFromCache(statusKey))
+        emitSource(statusRepository.loadLiveDataFromCache(statusKey, account.accountKey))
     }
 
     init {

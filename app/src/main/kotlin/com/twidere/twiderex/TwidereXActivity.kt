@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.hilt.lifecycle.HiltViewModelFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
@@ -45,14 +44,10 @@ import androidx.navigation.fragment.DialogFragmentNavigator
 import com.twidere.twiderex.action.AmbientStatusActions
 import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.component.foundation.AmbientInAppNotification
-import com.twidere.twiderex.di.assisted.AssistedViewModelFactoryHolder
-import com.twidere.twiderex.di.assisted.ProvideAssistedFactory
-import com.twidere.twiderex.extensions.ProvideNavigationViewModelFactoryMap
 import com.twidere.twiderex.launcher.ActivityLauncher
 import com.twidere.twiderex.launcher.AmbientLauncher
 import com.twidere.twiderex.navigation.Router
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.preferences.PreferencesHolder
 import com.twidere.twiderex.preferences.ProvidePreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientActiveAccountViewModel
@@ -64,10 +59,8 @@ import com.twidere.twiderex.ui.AmbientWindow
 import com.twidere.twiderex.ui.AmbientWindowPadding
 import com.twidere.twiderex.ui.ProvideWindowPadding
 import com.twidere.twiderex.viewmodel.ActiveAccountViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class TwidereXActivity : FragmentActivity() {
 
     val navController by lazy {
@@ -82,20 +75,11 @@ class TwidereXActivity : FragmentActivity() {
     private lateinit var launcher: ActivityLauncher
     private val isActiveNetworkMetered = MutableLiveData(false)
 
-    @Inject
-    lateinit var statusActions: StatusActions
+    private val statusActions: StatusActions by inject()
 
-    @Inject
-    lateinit var preferencesHolder: PreferencesHolder
+    private val inAppNotification: InAppNotification by inject()
 
-    @Inject
-    lateinit var assistedViewModelFactoryHolder: AssistedViewModelFactoryHolder
-
-    @Inject
-    lateinit var inAppNotification: InAppNotification
-
-    @Inject
-    lateinit var connectivityManager: ConnectivityManager
+    private val connectivityManager: ConnectivityManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,23 +127,15 @@ class TwidereXActivity : FragmentActivity() {
                 AmbientActiveAccountViewModel provides accountViewModel,
                 AmbientIsActiveNetworkMetered provides isActiveNetworkMetered
             ) {
-                ProvidePreferences(
-                    preferencesHolder,
-                ) {
-                    ProvideAssistedFactory(
-                        assistedViewModelFactoryHolder
-                    ) {
-                        ProvideNavigationViewModelFactoryMap(factory = defaultViewModelProviderFactory as HiltViewModelFactory) {
-                            ProvideWindowPadding {
-                                val windowPadding = AmbientWindowPadding.current
-                                Box(
-                                    modifier = Modifier.padding(windowPadding)
-                                ) {
-                                    Router(
-                                        navController = navController
-                                    )
-                                }
-                            }
+                ProvidePreferences {
+                    ProvideWindowPadding {
+                        val windowPadding = AmbientWindowPadding.current
+                        Box(
+                            modifier = Modifier.padding(windowPadding)
+                        ) {
+                            Router(
+                                navController = navController
+                            )
                         }
                     }
                 }

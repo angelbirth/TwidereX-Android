@@ -71,9 +71,8 @@ import com.twidere.twiderex.component.status.StatusDivider
 import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
-import com.twidere.twiderex.extensions.viewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientActiveAccount
@@ -84,21 +83,20 @@ import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
 import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchUserViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScene(keyword: String) {
     val account = AmbientActiveAccount.current ?: return
-    val tweetsViewModel =
-        assistedViewModel<TwitterSearchTweetsViewModel.AssistedFactory, TwitterSearchTweetsViewModel> {
-            it.create(account, keyword)
-        }
-    val mediaViewModel =
-        assistedViewModel<TwitterSearchMediaViewModel.AssistedFactory, TwitterSearchMediaViewModel> {
-            it.create(account, keyword)
-        }
-    val usersViewModel = viewModel {
-        TwitterSearchUserViewModel(account, keyword)
+    val tweetsViewModel = viewModel<TwitterSearchTweetsViewModel> {
+        parametersOf(account, keyword)
+    }
+    val mediaViewModel = viewModel<TwitterSearchMediaViewModel> {
+        parametersOf(account, keyword)
+    }
+    val usersViewModel = viewModel<TwitterSearchUserViewModel> {
+        parametersOf(account, keyword)
     }
     var selectedTab by savedInstanceState { 0 }
     val navigator = AmbientNavigator.current

@@ -29,25 +29,22 @@ import androidx.datastore.core.DataStore
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import com.twidere.twiderex.ui.AmbientVideoPlayback
-import javax.inject.Inject
+import org.koin.androidx.compose.get
+import org.koin.core.qualifier.named
 
 val AmbientAppearancePreferences = ambientOf<AppearancePreferences>()
 val AmbientDisplayPreferences = ambientOf<DisplayPreferences>()
 
-data class PreferencesHolder @Inject constructor(
-    val appearancePreferences: DataStore<AppearancePreferences>,
-    val displayPreferences: DataStore<DisplayPreferences>,
-)
-
 @Composable
 fun ProvidePreferences(
-    holder: PreferencesHolder,
+    appearancePreferences: DataStore<AppearancePreferences> = get(qualifier = named("appearances")),
+    displayPreferences: DataStore<DisplayPreferences> = get(qualifier = named("display")),
     content: @Composable () -> Unit,
 ) {
-    val appearances by holder.appearancePreferences
+    val appearances by appearancePreferences
         .data
         .collectAsState(initial = AppearancePreferences.getDefaultInstance())
-    val display by holder.displayPreferences
+    val display by displayPreferences
         .data
         .collectAsState(initial = DisplayPreferences.getDefaultInstance())
 

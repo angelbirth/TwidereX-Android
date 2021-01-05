@@ -21,16 +21,12 @@
 package com.twidere.twiderex.paging.mediator
 
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 
 class MentionTimelineMediator(
     private val service: TimelineService,
     accountKey: MicroBlogKey,
-    database: AppDatabase,
-    inAppNotification: InAppNotification,
-) : PagingWithGapMediator(accountKey, database, inAppNotification) {
+) : PagingWithGapMediator(accountKey) {
     override suspend fun loadBetweenImpl(
         pageSize: Int,
         max_id: String?,

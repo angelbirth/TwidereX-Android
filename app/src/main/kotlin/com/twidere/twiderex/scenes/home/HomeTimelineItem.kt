@@ -30,12 +30,13 @@ import androidx.navigation.compose.navigate
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.navigation.Route
 import com.twidere.twiderex.scenes.ComposeType
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
+import org.koin.core.parameter.parametersOf
 
 class HomeTimelineItem : HomeNavigationItem() {
     override val name: String
@@ -51,10 +52,10 @@ class HomeTimelineItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current ?: return
-        val viewModel = assistedViewModel<HomeTimelineViewModel.AssistedFactory, HomeTimelineViewModel>(
+        val viewModel = viewModel<HomeTimelineViewModel>(
             account
         ) {
-            it.create(account)
+            parametersOf(account)
         }
         InAppNotificationScaffold(
             floatingActionButton = {

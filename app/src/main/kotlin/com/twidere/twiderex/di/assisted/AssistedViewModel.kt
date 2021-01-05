@@ -21,97 +21,97 @@
 package com.twidere.twiderex.di.assisted
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticAmbientOf
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.twidere.twiderex.viewmodel.ComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftComposeViewModel
-import com.twidere.twiderex.viewmodel.DraftItemViewModel
-import com.twidere.twiderex.viewmodel.MediaViewModel
-import com.twidere.twiderex.viewmodel.search.SearchInputViewModel
-import com.twidere.twiderex.viewmodel.timeline.HomeTimelineViewModel
-import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
-import com.twidere.twiderex.viewmodel.twitter.TwitterStatusViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchMediaViewModel
-import com.twidere.twiderex.viewmodel.twitter.search.TwitterSearchTweetsViewModel
-import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
-import com.twidere.twiderex.viewmodel.user.UserViewModel
-import javax.inject.Inject
+import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.ParametersDefinition
+import org.koin.core.qualifier.named
 
 @Composable
-inline fun <reified AF : IAssistedFactory, reified VM : ViewModel> assistedViewModel(
+inline fun <reified VM : ViewModel> viewModel(
     vararg dependsOn: Any,
-    noinline creator: ((AF) -> VM)? = null,
-): VM {
-    val factories = AmbientAssistedFactories.current
-    val factory = factories.firstOrNull { AF::class.java.isInstance(it) } as? AF
-    return viewModel(
-        if (dependsOn.any()) {
-            dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
-        } else {
-            null
-        },
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return factory?.let { creator?.invoke(it) } as T
-            }
-        }
-    )
-}
-
-interface IAssistedFactory
-
-data class AssistedViewModelFactoryHolder @Inject constructor(
-    val homeTimelineViewModelFactory: HomeTimelineViewModel.AssistedFactory,
-    val twitterStatusViewModelFactory: TwitterStatusViewModel.AssistedFactory,
-    val mentionsTimelineViewModelFactory: MentionsTimelineViewModel.AssistedFactory,
-    val twitterSearchMediaViewModelFactory: TwitterSearchMediaViewModel.AssistedFactory,
-    val twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory,
-    val userFavouriteTimelineViewModelFactory: UserFavouriteTimelineViewModel.AssistedFactory,
-    val userTimelineViewModelFactory: UserTimelineViewModel.AssistedFactory,
-    val userMediaTimelineViewModelFactory: UserMediaTimelineViewModel.AssistedFactory,
-    val userViewModelFactory: UserViewModel.AssistedFactory,
-    val composeViewModelFactory: ComposeViewModel.AssistedFactory,
-    val mediaViewModelFactory: MediaViewModel.AssistedFactory,
-    val searchInputViewModelFactory: SearchInputViewModel.AssistedFactory,
-    val draftItemViewModelFactory: DraftItemViewModel.AssistedFactory,
-    val draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory,
+    noinline parameters: ParametersDefinition? = null
+) = getViewModel<VM>(
+    if (dependsOn.any()) {
+        named(dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName)
+    } else {
+        null
+    },
+    parameters = parameters
 )
 
-@Composable
-fun ProvideAssistedFactory(
-    factoryHolder: AssistedViewModelFactoryHolder,
-    content: @Composable () -> Unit,
-) {
-    val factory = remember {
-        listOf(
-            factoryHolder.homeTimelineViewModelFactory,
-            factoryHolder.twitterStatusViewModelFactory,
-            factoryHolder.mentionsTimelineViewModelFactory,
-            factoryHolder.twitterSearchMediaViewModelFactory,
-            factoryHolder.twitterSearchTweetsViewModelFactory,
-            factoryHolder.userFavouriteTimelineViewModelFactory,
-            factoryHolder.userTimelineViewModelFactory,
-            factoryHolder.userMediaTimelineViewModelFactory,
-            factoryHolder.userViewModelFactory,
-            factoryHolder.composeViewModelFactory,
-            factoryHolder.mediaViewModelFactory,
-            factoryHolder.searchInputViewModelFactory,
-            factoryHolder.draftItemViewModelFactory,
-            factoryHolder.draftComposeViewModelFactory,
-        )
-    }
-    Providers(
-        AmbientAssistedFactories provides factory
-    ) {
-        content.invoke()
-    }
-}
+// @Composable
+// inline fun <reified AF : IAssistedFactory, reified VM : ViewModel> assistedViewModel(
+//    vararg dependsOn: Any,
+//    noinline creator: ((AF) -> VM)? = null,
+// ): VM {
+//    getViewModel<VM> {
+//        parametersOf()
+//    }
+//    val a: HomeTimelineViewModel by inject { parametersOf() }
+//  /*  val factories = AmbientAssistedFactories.current
+//    val factory = factories.firstOrNull { AF::class.java.isInstance(it) } as? AF
+//    return viewModel(
+//        if (dependsOn.any()) {
+//            dependsOn.joinToString { it.hashCode().toString() } + VM::class.java.canonicalName
+//        } else {
+//            null
+//        },
+//        factory = object : ViewModelProvider.Factory {
+//            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+//                @Suppress("UNCHECKED_CAST")
+//                return factory?.let { creator?.invoke(it) } as T
+//            }
+//        }
+//    )*/
+// }
+//
+// interface IAssistedFactory
 
-val AmbientAssistedFactories = staticAmbientOf<List<IAssistedFactory>>()
+// data class AssistedViewModelFactoryHolder @Inject constructor(
+//    val homeTimelineViewModelFactory: HomeTimelineViewModel.AssistedFactory,
+//    val twitterStatusViewModelFactory: TwitterStatusViewModel.AssistedFactory,
+//    val mentionsTimelineViewModelFactory: MentionsTimelineViewModel.AssistedFactory,
+//    val twitterSearchMediaViewModelFactory: TwitterSearchMediaViewModel.AssistedFactory,
+//    val twitterSearchTweetsViewModelFactory: TwitterSearchTweetsViewModel.AssistedFactory,
+//    val userFavouriteTimelineViewModelFactory: UserFavouriteTimelineViewModel.AssistedFactory,
+//    val userTimelineViewModelFactory: UserTimelineViewModel.AssistedFactory,
+//    val userMediaTimelineViewModelFactory: UserMediaTimelineViewModel.AssistedFactory,
+//    val userViewModelFactory: UserViewModel.AssistedFactory,
+//    val composeViewModelFactory: ComposeViewModel.AssistedFactory,
+//    val mediaViewModelFactory: MediaViewModel.AssistedFactory,
+//    val searchInputViewModelFactory: SearchInputViewModel.AssistedFactory,
+//    val draftItemViewModelFactory: DraftItemViewModel.AssistedFactory,
+//    val draftComposeViewModelFactory: DraftComposeViewModel.AssistedFactory,
+// )
+//
+// @Composable
+// fun ProvideAssistedFactory(
+//    factoryHolder: AssistedViewModelFactoryHolder,
+//    content: @Composable () -> Unit,
+// ) {
+//    val factory = remember {
+//        listOf(
+//            factoryHolder.homeTimelineViewModelFactory,
+//            factoryHolder.twitterStatusViewModelFactory,
+//            factoryHolder.mentionsTimelineViewModelFactory,
+//            factoryHolder.twitterSearchMediaViewModelFactory,
+//            factoryHolder.twitterSearchTweetsViewModelFactory,
+//            factoryHolder.userFavouriteTimelineViewModelFactory,
+//            factoryHolder.userTimelineViewModelFactory,
+//            factoryHolder.userMediaTimelineViewModelFactory,
+//            factoryHolder.userViewModelFactory,
+//            factoryHolder.composeViewModelFactory,
+//            factoryHolder.mediaViewModelFactory,
+//            factoryHolder.searchInputViewModelFactory,
+//            factoryHolder.draftItemViewModelFactory,
+//            factoryHolder.draftComposeViewModelFactory,
+//        )
+//    }
+//    Providers(
+//        AmbientAssistedFactories provides factory
+//    ) {
+//        content.invoke()
+//    }
+// }
+//
+// val AmbientAssistedFactories = staticAmbientOf<List<IAssistedFactory>>()

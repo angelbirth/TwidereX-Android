@@ -20,12 +20,20 @@
  */
 package com.twidere.twiderex.di
 
-import com.squareup.inject.assisted.dagger2.AssistedModule
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import org.koin.core.context.GlobalContext
+import org.koin.core.parameter.ParametersDefinition
+import org.koin.core.qualifier.Qualifier
 
-@InstallIn(ActivityComponent::class)
-@AssistedModule
-@Module
-interface AssistedInjectModule
+inline fun <reified T : Any> inject(
+    qualifier: Qualifier? = null,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    noinline parameters: ParametersDefinition? = null
+) = GlobalContext.get().inject<T>(qualifier, mode, parameters)
+
+inline fun <reified T : Any> get(
+    qualifier: Qualifier? = null,
+    noinline parameters: ParametersDefinition? = null
+) = GlobalContext.get().get<T>(
+    qualifier,
+    parameters
+)

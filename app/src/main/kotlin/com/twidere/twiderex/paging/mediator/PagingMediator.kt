@@ -27,13 +27,16 @@ import androidx.paging.RemoteMediator
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.defaultLoadCount
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
+import com.twidere.twiderex.notification.InAppNotification
 
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingMediator(
-    val database: AppDatabase,
     val accountKey: MicroBlogKey,
 ) : RemoteMediator<Int, DbPagingTimelineWithStatus>() {
+    val database: AppDatabase by inject()
+    protected val inAppNotification: InAppNotification by inject()
     abstract val pagingKey: String
 }
 
@@ -47,6 +50,7 @@ fun PagingMediator.pager(
         ),
         remoteMediator = this,
     ) {
-        database.pagingTimelineDao().getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
+        database.pagingTimelineDao()
+            .getPagingSource(pagingKey = pagingKey, accountKey = accountKey)
     }
 }

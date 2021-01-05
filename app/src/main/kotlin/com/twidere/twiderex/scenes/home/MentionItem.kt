@@ -27,9 +27,10 @@ import androidx.compose.ui.res.vectorResource
 import com.twidere.twiderex.R
 import com.twidere.twiderex.component.TimelineComponent
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.ui.AmbientActiveAccount
 import com.twidere.twiderex.viewmodel.timeline.MentionsTimelineViewModel
+import org.koin.core.parameter.parametersOf
 
 class MentionItem : HomeNavigationItem() {
     override val name: String
@@ -45,12 +46,11 @@ class MentionItem : HomeNavigationItem() {
     @Composable
     override fun onCompose() {
         val account = AmbientActiveAccount.current ?: return
-        val viewModel =
-            assistedViewModel<MentionsTimelineViewModel.AssistedFactory, MentionsTimelineViewModel>(
-                account
-            ) {
-                it.create(account)
-            }
+        val viewModel = viewModel<MentionsTimelineViewModel>(
+            account
+        ) {
+            parametersOf(account)
+        }
         InAppNotificationScaffold {
             TimelineComponent(viewModel = viewModel)
         }

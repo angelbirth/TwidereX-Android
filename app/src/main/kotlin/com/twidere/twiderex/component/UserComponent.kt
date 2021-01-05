@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +75,7 @@ import com.twidere.twiderex.component.status.StatusMediaPreviewItem
 import com.twidere.twiderex.component.status.TimelineStatusComponent
 import com.twidere.twiderex.component.status.UserAvatar
 import com.twidere.twiderex.component.status.withAvatarClip
-import com.twidere.twiderex.di.assisted.assistedViewModel
+import com.twidere.twiderex.di.assisted.viewModel
 import com.twidere.twiderex.extensions.refreshOrRetry
 import com.twidere.twiderex.extensions.withElevation
 import com.twidere.twiderex.model.MicroBlogKey
@@ -89,6 +90,7 @@ import com.twidere.twiderex.viewmodel.user.UserFavouriteTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserMediaTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserTimelineViewModel
 import com.twidere.twiderex.viewmodel.user.UserViewModel
+import org.koin.core.parameter.parametersOf
 
 @IncomingComposeUpdate
 @Composable
@@ -99,40 +101,40 @@ fun UserComponent(
     initialData: UiUser? = null,
 ) {
     val account = AmbientActiveAccount.current ?: return
-    val viewModel = assistedViewModel<UserViewModel.AssistedFactory, UserViewModel>(
+    val viewModel = viewModel<UserViewModel>(
         account,
         screenName,
         host,
     ) {
-        it.create(account, screenName, host, initialUserKey)
+        parametersOf(account, screenName, host, initialUserKey)
     }
     val user by viewModel.user.observeAsState(initial = initialData)
 
     val lazyListState = rememberLazyListState()
-    val timelineViewModel =
-        assistedViewModel<UserTimelineViewModel.AssistedFactory, UserTimelineViewModel>(
-            account,
-            screenName,
-            host,
-        ) {
-            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
-        }
-    val mediaViewModel =
-        assistedViewModel<UserMediaTimelineViewModel.AssistedFactory, UserMediaTimelineViewModel>(
-            account,
-            screenName,
-            host,
-        ) {
-            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
-        }
-    val favouriteViewModel =
-        assistedViewModel<UserFavouriteTimelineViewModel.AssistedFactory, UserFavouriteTimelineViewModel>(
-            account,
-            screenName,
-            host,
-        ) {
-            it.create(account, screenName = screenName, MicroBlogKey(screenName, host))
-        }
+    val key = remember {
+        MicroBlogKey(screenName, host)
+    }
+    val timelineViewModel = viewModel<UserTimelineViewModel>(
+        account,
+        screenName,
+        host,
+    ) {
+        parametersOf(account, screenName, key)
+    }
+    val mediaViewModel = viewModel<UserMediaTimelineViewModel>(
+        account,
+        screenName,
+        host,
+    ) {
+        parametersOf(account, screenName, key)
+    }
+    val favouriteViewModel = viewModel<UserFavouriteTimelineViewModel>(
+        account,
+        screenName,
+        host,
+    ) {
+        parametersOf(account, screenName, key)
+    }
 
     val timelineSource = timelineViewModel.source.collectAsLazyPagingItems()
     val mediaSource = mediaViewModel.source.collectAsLazyPagingItems()

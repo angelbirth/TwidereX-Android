@@ -21,8 +21,6 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OverwritingInputMerger
@@ -35,9 +33,9 @@ import com.twidere.twiderex.repository.ReactionRepository
 import com.twidere.twiderex.repository.StatusRepository
 import com.twidere.twiderex.worker.successResult
 
-class UpdateStatusWorker @WorkerInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class UpdateStatusWorker(
+    appContext: Context,
+    params: WorkerParameters,
     private val repository: ReactionRepository,
     private val statusRepository: StatusRepository,
 ) : CoroutineWorker(appContext, params) {

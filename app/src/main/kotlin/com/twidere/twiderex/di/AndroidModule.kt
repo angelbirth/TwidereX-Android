@@ -22,45 +22,18 @@ package com.twidere.twiderex.di
 
 import android.accounts.AccountManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.twidere.twiderex.db.AppDatabase
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object AndroidModule {
-    @Provides
-    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
-        WorkManager.getInstance(context)
-
-    @Provides
-    fun provideAccountManager(@ApplicationContext context: Context): AccountManager =
-        AccountManager.get(context)
-
-    @Provides
-    fun provideSharedPreference(@ApplicationContext context: Context): SharedPreferences =
-        context.getSharedPreferences("twiderex", Context.MODE_PRIVATE)
-
-    @Singleton
-    @Provides
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, "twiderex-db")
-            .build()
-
-    @Provides
-    fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
-        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-    @Provides
-    fun provideConnectivityManager(@ApplicationContext context: Context): ConnectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+val androidModule = module {
+    factory { WorkManager.getInstance(get()) }
+    factory { AccountManager.get(get()) }
+    factory { get<Context>().getSharedPreferences("twiderex", Context.MODE_PRIVATE) }
+    single { Room.databaseBuilder(get(), AppDatabase::class.java, "twiderex-db").build() }
+    factory { get<Context>().getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+    factory { get<Context>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 }

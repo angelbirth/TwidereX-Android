@@ -21,11 +21,11 @@
 package com.twidere.twiderex.viewmodel.mastodon
 
 import android.accounts.Account
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twidere.services.mastodon.MastodonOAuthService
 import com.twidere.twiderex.db.mapper.toDbUser
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.PlatformType
@@ -36,9 +36,8 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.scenes.mastodon.MASTODON_CALLBACK_URL
 import com.twidere.twiderex.utils.json
 
-class MastodonSignInViewModel @ViewModelInject constructor(
-    private val repository: AccountRepository,
-) : ViewModel() {
+class MastodonSignInViewModel() : ViewModel() {
+    private val repository: AccountRepository by inject()
     val loading = MutableLiveData(false)
     val host = MutableLiveData("")
     fun setHost(value: String) {

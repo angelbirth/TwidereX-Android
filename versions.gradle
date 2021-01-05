@@ -15,6 +15,7 @@ ext {
             ktlint               : '0.39.0',
             assisted_inject      : '0.6.0',
             protobuf             : '3.14.0',
+            koin_version         : '2.2.1'
     ]
     global = [
             compileSdkVersion: 30,

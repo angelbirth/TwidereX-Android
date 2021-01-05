@@ -21,18 +21,49 @@
 package com.twidere.twiderex
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import androidx.work.WorkManager
+import androidx.work.await
+import com.twidere.twiderex.di.androidModule
+import com.twidere.twiderex.di.preferenceModule
+import com.twidere.twiderex.di.repositoryModule
+import com.twidere.twiderex.di.twidereModule
+import com.twidere.twiderex.di.viewModelModule
+import com.twidere.twiderex.di.workerModule
+import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
+import org.koin.core.KoinExperimentalAPI
+import org.koin.core.context.startKoin
 
-@HiltAndroidApp
-class TwidereApp : Application(), Configuration.Provider {
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
+class TwidereApp : Application() {
+    @OptIn(KoinExperimentalAPI::class)
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@TwidereApp)
+            workManagerFactory()
+            modules(androidModule)
+            modules(preferenceModule)
+            modules(twidereModule)
+            modules(repositoryModule)
+            modules(viewModelModule)
+            modules(workerModule)
+        }
+        cancelPendingWorkManager(this)
+    }
+}
 
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+/**
+ * If there is a pending work because of previous crash we'd like it to not run.
+ *
+ */
+private fun cancelPendingWorkManager(app: TwidereApp) {
+    runBlocking {
+        WorkManager.getInstance(app)
+            .cancelAllWork()
+            .result
+            .await()
+    }
 }

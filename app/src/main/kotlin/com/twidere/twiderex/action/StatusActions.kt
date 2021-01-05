@@ -22,6 +22,7 @@ package com.twidere.twiderex.action
 
 import androidx.compose.runtime.ambientOf
 import androidx.work.WorkManager
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.worker.NotificationWorker
@@ -32,7 +33,6 @@ import com.twidere.twiderex.worker.status.StatusWorker
 import com.twidere.twiderex.worker.status.UnLikeWorker
 import com.twidere.twiderex.worker.status.UnRetweetWorker
 import com.twidere.twiderex.worker.status.UpdateStatusWorker
-import javax.inject.Inject
 
 val AmbientStatusActions = ambientOf<IStatusActions>()
 
@@ -41,9 +41,9 @@ interface IStatusActions {
     fun retweet(status: UiStatus, account: AccountDetails) {}
 }
 
-class StatusActions @Inject constructor(
-    private val workManager: WorkManager,
-) : IStatusActions {
+class StatusActions : IStatusActions {
+
+    private val workManager: WorkManager by inject()
 
     override fun like(status: UiStatus, account: AccountDetails) {
         workManager.beginWith(

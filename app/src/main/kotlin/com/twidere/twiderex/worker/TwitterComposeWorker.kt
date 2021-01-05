@@ -22,8 +22,6 @@ package com.twidere.twiderex.worker
 
 import android.content.Context
 import android.net.Uri
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
@@ -37,9 +35,9 @@ import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.DraftRepository
 import com.twidere.twiderex.scenes.ComposeType
 
-class TwitterComposeWorker @WorkerInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class TwitterComposeWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val draftRepository: DraftRepository,
     private val accountRepository: AccountRepository,
 ) : CoroutineWorker(context, workerParams) {

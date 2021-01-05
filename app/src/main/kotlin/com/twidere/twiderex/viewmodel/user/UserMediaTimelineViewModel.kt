@@ -26,39 +26,23 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.flatMap
 import androidx.paging.map
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import com.twidere.services.microblog.TimelineService
-import com.twidere.twiderex.db.AppDatabase
-import com.twidere.twiderex.di.assisted.IAssistedFactory
 import com.twidere.twiderex.model.AccountDetails
 import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.model.ui.UiMedia
 import com.twidere.twiderex.model.ui.UiStatus
 import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.paging.mediator.PagingMediator
 import com.twidere.twiderex.paging.mediator.pager
 import com.twidere.twiderex.paging.mediator.user.UserMediaMediator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class UserMediaTimelineViewModel @AssistedInject constructor(
-    database: AppDatabase,
-    inAppNotification: InAppNotification,
-    @Assisted account: AccountDetails,
-    @Assisted screenName: String,
-    @Assisted userKey: MicroBlogKey,
+class UserMediaTimelineViewModel(
+    account: AccountDetails,
+    screenName: String,
+    userKey: MicroBlogKey,
 ) : ViewModel() {
-
-    @AssistedInject.Factory
-    interface AssistedFactory : IAssistedFactory {
-        fun create(
-            account: AccountDetails,
-            screenName: String,
-            userKey: MicroBlogKey,
-        ): UserMediaTimelineViewModel
-    }
 
     val source: Flow<PagingData<Pair<UiMedia, UiStatus>>> by lazy {
         pagingMediator.pager(pageSize = 200).flow.map { pagingData ->
@@ -76,9 +60,7 @@ class UserMediaTimelineViewModel @AssistedInject constructor(
         UserMediaMediator(
             screenName = screenName,
             userKey = userKey,
-            database,
             account.accountKey,
             account.service as TimelineService,
-            inAppNotification
         )
 }

@@ -21,8 +21,6 @@
 package com.twidere.twiderex.worker.status
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
 import androidx.work.WorkerParameters
 import com.twidere.services.microblog.StatusService
 import com.twidere.twiderex.db.mapper.toDbTimeline
@@ -33,9 +31,9 @@ import com.twidere.twiderex.model.ui.UiStatus.Companion.toUi
 import com.twidere.twiderex.repository.AccountRepository
 import com.twidere.twiderex.repository.StatusRepository
 
-class UnLikeWorker @WorkerInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
+class UnLikeWorker(
+    appContext: Context,
+    params: WorkerParameters,
     accountRepository: AccountRepository,
     statusRepository: StatusRepository
 ) : StatusWorker(appContext, params, accountRepository, statusRepository) {

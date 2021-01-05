@@ -20,47 +20,13 @@
  */
 package com.twidere.twiderex.di
 
-import androidx.work.WorkManager
 import com.twidere.twiderex.action.ComposeAction
-import com.twidere.twiderex.db.AppDatabase
+import com.twidere.twiderex.action.StatusActions
 import com.twidere.twiderex.notification.InAppNotification
-import com.twidere.twiderex.repository.DraftRepository
-import com.twidere.twiderex.repository.ReactionRepository
-import com.twidere.twiderex.repository.SearchRepository
-import com.twidere.twiderex.repository.StatusRepository
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object TwidereModule {
-    @Singleton
-    @Provides
-    fun provideComposeQueue(
-        workManager: WorkManager,
-    ): ComposeAction = ComposeAction(workManager = workManager)
-
-    @Singleton
-    @Provides
-    fun provideDraftRepository(database: AppDatabase): DraftRepository =
-        DraftRepository(database = database)
-
-    @Provides
-    fun provideSearchRepository(database: AppDatabase): SearchRepository =
-        SearchRepository(database = database)
-
-    @Provides
-    fun provideStatusRepository(database: AppDatabase): StatusRepository =
-        StatusRepository(database = database)
-
-    @Provides
-    fun provideReactionRepository(database: AppDatabase): ReactionRepository =
-        ReactionRepository(database = database)
-
-    @Singleton
-    @Provides
-    fun provideInAppNotification(): InAppNotification = InAppNotification()
+val twidereModule = module {
+    single { StatusActions() }
+    single { ComposeAction() }
+    single { InAppNotification() }
 }

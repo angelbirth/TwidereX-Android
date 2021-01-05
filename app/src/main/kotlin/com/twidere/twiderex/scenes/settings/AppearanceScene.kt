@@ -54,7 +54,6 @@ import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.lazy.itemDivider
 import com.twidere.twiderex.component.settings.radioItem
 import com.twidere.twiderex.extensions.isDarkTheme
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.preferences.AmbientAppearancePreferences
 import com.twidere.twiderex.preferences.proto.AppearancePreferences
 import com.twidere.twiderex.ui.TwidereXTheme
@@ -62,12 +61,13 @@ import com.twidere.twiderex.ui.primaryColors
 import com.twidere.twiderex.ui.profileImageSize
 import com.twidere.twiderex.ui.standardPadding
 import com.twidere.twiderex.viewmodel.settings.AppearanceViewModel
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun AppearanceScene() {
     var showPrimaryColorDialog by remember { mutableStateOf(false) }
     val appearance = AmbientAppearancePreferences.current
-    val viewModel = navViewModel<AppearanceViewModel>()
+    val viewModel = getViewModel<AppearanceViewModel>()
     TwidereXTheme {
         InAppNotificationScaffold(
             topBar = {

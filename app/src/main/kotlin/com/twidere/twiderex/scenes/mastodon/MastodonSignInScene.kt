@@ -44,7 +44,6 @@ import com.twidere.twiderex.R
 import com.twidere.twiderex.component.LoginLogo
 import com.twidere.twiderex.component.foundation.InAppNotificationScaffold
 import com.twidere.twiderex.component.navigation.AmbientNavigator
-import com.twidere.twiderex.extensions.navViewModel
 import com.twidere.twiderex.ui.AmbientNavController
 import com.twidere.twiderex.ui.TwidereXTheme
 import com.twidere.twiderex.viewmodel.mastodon.MastodonSignInViewModel
@@ -52,12 +51,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.compose.getViewModel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun MastodonSignInScene() {
-    val viewModel = navViewModel<MastodonSignInViewModel>()
+    val viewModel = getViewModel<MastodonSignInViewModel>()
     val host by viewModel.host.observeAsState(initial = "")
     val loading by viewModel.loading.observeAsState(initial = false)
     val navController = AmbientNavController.current

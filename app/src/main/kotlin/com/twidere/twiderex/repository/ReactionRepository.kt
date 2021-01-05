@@ -22,12 +22,12 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbStatusReaction
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.model.MicroBlogKey
 import java.util.UUID
 
-class ReactionRepository(
-    private val database: AppDatabase,
-) {
+class ReactionRepository {
+    private val database: AppDatabase by inject()
     suspend fun updateReaction(
         accountKey: MicroBlogKey,
         statusKey: MicroBlogKey,

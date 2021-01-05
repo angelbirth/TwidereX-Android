@@ -22,13 +22,13 @@ package com.twidere.twiderex.repository
 
 import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.model.DbSearch
+import com.twidere.twiderex.di.inject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-class SearchRepository(
-    private val database: AppDatabase
-) {
+class SearchRepository {
+    private val database: AppDatabase by inject()
     val source by lazy {
         database.searchDao().getAll()
     }

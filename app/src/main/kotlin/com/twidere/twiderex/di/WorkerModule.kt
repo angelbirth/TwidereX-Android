@@ -18,29 +18,28 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Twidere X. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.twidere.twiderex.action
+package com.twidere.twiderex.di
 
-import androidx.work.WorkManager
-import com.twidere.twiderex.di.inject
-import com.twidere.twiderex.model.ComposeData
-import com.twidere.twiderex.model.MicroBlogKey
 import com.twidere.twiderex.worker.NotificationWorker
 import com.twidere.twiderex.worker.TwitterComposeWorker
 import com.twidere.twiderex.worker.draft.RemoveDraftWorker
 import com.twidere.twiderex.worker.draft.SaveDraftWorker
+import com.twidere.twiderex.worker.status.LikeWorker
+import com.twidere.twiderex.worker.status.RetweetWorker
+import com.twidere.twiderex.worker.status.UnLikeWorker
+import com.twidere.twiderex.worker.status.UnRetweetWorker
+import com.twidere.twiderex.worker.status.UpdateStatusWorker
+import org.koin.androidx.workmanager.dsl.worker
+import org.koin.dsl.module
 
-class ComposeAction() {
-    private val workManager: WorkManager by inject()
-
-    fun commit(
-        accountKey: MicroBlogKey,
-        data: ComposeData,
-    ) {
-        workManager
-            .beginWith(SaveDraftWorker.create(data = data))
-            .then(TwitterComposeWorker.create(accountKey = accountKey, data = data))
-            .then(NotificationWorker.create())
-            .then(RemoveDraftWorker.create(draftId = data.draftId))
-            .enqueue()
-    }
+val workerModule = module {
+    worker { RemoveDraftWorker(get(), get(), get()) }
+    worker { SaveDraftWorker(get(), get(), get()) }
+    worker { LikeWorker(get(), get(), get(), get()) }
+    worker { RetweetWorker(get(), get(), get(), get()) }
+    worker { UnLikeWorker(get(), get(), get(), get()) }
+    worker { UnRetweetWorker(get(), get(), get(), get()) }
+    worker { UpdateStatusWorker(get(), get(), get(), get()) }
+    worker { NotificationWorker(get(), get(), get()) }
+    worker { TwitterComposeWorker(get(), get(), get(), get()) }
 }

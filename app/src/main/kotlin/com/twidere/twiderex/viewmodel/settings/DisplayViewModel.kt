@@ -21,15 +21,15 @@
 package com.twidere.twiderex.viewmodel.settings
 
 import androidx.datastore.core.DataStore
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.twidere.twiderex.di.inject
 import com.twidere.twiderex.preferences.proto.DisplayPreferences
 import kotlinx.coroutines.launch
+import org.koin.core.qualifier.named
 
-class DisplayViewModel @ViewModelInject constructor(
-    private val displayPreferences: DataStore<DisplayPreferences>
-) : ViewModel() {
+class DisplayViewModel : ViewModel() {
+    private val displayPreferences: DataStore<DisplayPreferences> by inject(qualifier = named("display"))
     fun setUseSystemFontSize(value: Boolean) = viewModelScope.launch {
         displayPreferences.updateData {
             it.toBuilder().setUseSystemFontSize(value).build()

@@ -27,14 +27,12 @@ import androidx.paging.PagingState
 import androidx.room.withTransaction
 import com.twidere.services.http.MicroBlogException
 import com.twidere.services.microblog.model.IStatus
-import com.twidere.twiderex.db.AppDatabase
 import com.twidere.twiderex.db.mapper.toDbTimeline
 import com.twidere.twiderex.db.model.DbPagingTimeline.Companion.toPagingDbTimeline
 import com.twidere.twiderex.db.model.DbPagingTimelineWithStatus
 import com.twidere.twiderex.db.model.TimelineType
 import com.twidere.twiderex.db.model.saveToDb
 import com.twidere.twiderex.model.MicroBlogKey
-import com.twidere.twiderex.notification.InAppNotification
 import com.twidere.twiderex.utils.show
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -45,9 +43,7 @@ import java.net.SocketTimeoutException
 @OptIn(ExperimentalPagingApi::class)
 abstract class PagingWithGapMediator(
     accountKey: MicroBlogKey,
-    database: AppDatabase,
-    private val inAppNotification: InAppNotification,
-) : PagingMediator(accountKey = accountKey, database = database) {
+) : PagingMediator(accountKey = accountKey) {
     private var loadCount = 0
     protected open val skipInitialLoad = true
     val loadingBetween = MutableLiveData(listOf<MicroBlogKey>())

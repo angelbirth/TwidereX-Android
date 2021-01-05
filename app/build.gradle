@@ -9,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt"
+        classpath "org.koin:koin-gradle-plugin:$versions.koin_version"
         if (enableGoogleVariant) {
             // START Non-FOSS component
             classpath 'com.google.gms:google-services:4.3.4'
@@ -32,7 +32,7 @@ if (enableGoogleVariant) {
     apply plugin: 'com.google.firebase.crashlytics'
     // END Non-FOSS component
 }
-apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'koin'
 
 android {
     compileSdkVersion global.compileSdkVersion
@@ -166,14 +166,14 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:$versions.moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"
 
-    implementation "com.google.dagger:hilt-android:$versions.hilt"
-    kapt "com.google.dagger:hilt-android-compiler:$versions.hilt"
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:$versions.androidx_hilt"
-    implementation "androidx.hilt:hilt-work:$versions.androidx_hilt"
-    kapt "androidx.hilt:hilt-compiler:$versions.androidx_hilt"
-
-    compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:$versions.assisted_inject"
-    kapt "com.squareup.inject:assisted-inject-processor-dagger2:$versions.assisted_inject"
+    implementation "org.koin:koin-core:$versions.koin_version"
+    implementation "org.koin:koin-core-ext:$versions.koin_version"
+    testImplementation "org.koin:koin-test:$versions.koin_version"
+    implementation "org.koin:koin-android:$versions.koin_version"
+    implementation "org.koin:koin-android-scope:$versions.koin_version"
+    implementation "org.koin:koin-android-viewmodel:$versions.koin_version"
+    implementation "org.koin:koin-androidx-workmanager:$versions.koin_version"
+    implementation "org.koin:koin-androidx-compose:$versions.koin_version"
 
     implementation "androidx.room:room-runtime:$versions.room"
     kapt "androidx.room:room-compiler:$versions.room"
