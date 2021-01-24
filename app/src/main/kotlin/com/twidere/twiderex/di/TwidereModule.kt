@@ -21,7 +21,9 @@
 package com.twidere.twiderex.di
 
 import androidx.work.WorkManager
+import com.twidere.twiderex.BuildConfig
 import com.twidere.twiderex.action.ComposeAction
+import com.twidere.twiderex.action.LinkPreviewAction
 import com.twidere.twiderex.db.CacheDatabase
 import com.twidere.twiderex.db.DraftDatabase
 import com.twidere.twiderex.notification.InAppNotification
@@ -34,6 +36,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -64,4 +68,25 @@ object TwidereModule {
     @Singleton
     @Provides
     fun provideInAppNotification(): InAppNotification = InAppNotification()
+
+    @Singleton
+    @Provides
+    fun provideLikePreviewAction(workManager: WorkManager): LinkPreviewAction =
+        LinkPreviewAction(workManager = workManager)
+
+    @Provides
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient
+            .Builder()
+            .apply {
+                if (BuildConfig.DEBUG) {
+                    addInterceptor(
+                        HttpLoggingInterceptor().apply {
+                            setLevel(HttpLoggingInterceptor.Level.BODY)
+                        }
+                    )
+                }
+            }
+            .build()
+    }
 }

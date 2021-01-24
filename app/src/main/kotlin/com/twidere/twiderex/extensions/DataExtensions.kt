@@ -26,6 +26,9 @@ import androidx.work.hasKeyWithValueOfType
 fun Data.getNullableLong(name: String) =
     takeIf { hasKeyWithValueOfType<Long>(name) }?.getLong(name, 0)
 
+fun Data.getNullableInt(name: String) =
+    takeIf { hasKeyWithValueOfType<Int>(name) }?.getInt(name, 0)
+
 fun Data.getNullableDouble(name: String) =
     takeIf { hasKeyWithValueOfType<Double>(name) }?.getDouble(name, 0.0)
 
