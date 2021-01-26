@@ -23,14 +23,19 @@ package com.twidere.services.mastodon
 import com.twidere.services.http.authorization.BearerAuthorization
 import com.twidere.services.http.retrofit
 import com.twidere.services.mastodon.api.MastodonResources
+import com.twidere.services.mastodon.api.model.ExcludeTypes
 import com.twidere.services.microblog.MicroBlogService
+import com.twidere.services.microblog.NotificationService
 import com.twidere.services.microblog.TimelineService
+import com.twidere.services.microblog.model.INotification
 import com.twidere.services.microblog.model.IStatus
 
 class MastodonService(
     private val host: String,
     private val accessToken: String,
-) : MicroBlogService, TimelineService {
+) : MicroBlogService,
+    TimelineService,
+    NotificationService {
     private val resources by lazy {
         retrofit<MastodonResources>(
             "https://$host",
@@ -49,7 +54,18 @@ class MastodonService(
         since_id: String?,
         max_id: String?
     ): List<IStatus> {
-        TODO("Not yet implemented")
+        return resources.notifications(
+            max_id,
+            since_id,
+            exclude_types = listOf(
+                ExcludeTypes.favourite,
+                ExcludeTypes.follow,
+                ExcludeTypes.follow_request,
+                ExcludeTypes.poll,
+                ExcludeTypes.reblog,
+            ),
+            limit = count
+        ).mapNotNull { it.status }
     }
 
     override suspend fun userTimeline(
@@ -70,4 +86,10 @@ class MastodonService(
     ): List<IStatus> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun notification(
+        since_id: String?,
+        max_id: String?,
+        count: Int
+    ): List<INotification> = resources.notifications(max_id, since_id, limit = count)
 }
