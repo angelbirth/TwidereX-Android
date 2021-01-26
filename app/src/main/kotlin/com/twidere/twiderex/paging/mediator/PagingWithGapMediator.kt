@@ -112,6 +112,10 @@ abstract class PagingWithGapMediator(
             }
             val result = loadBetweenImpl(pageSize, max_id = max_id, since_id = since_id).map {
                 it.toDbTimeline(accountKey, TimelineType.Custom).toPagingDbTimeline(pagingKey)
+            }.let {
+                it.filter {
+                    it.status.status.data.statusKey != maxStatusKey
+                }
             }
             database.withTransaction {
                 if (maxStatusKey != null) {

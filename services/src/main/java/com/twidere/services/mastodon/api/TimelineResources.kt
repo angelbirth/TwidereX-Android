@@ -20,6 +20,8 @@
  */
 package com.twidere.services.mastodon.api
 
+import com.twidere.services.mastodon.api.model.ExcludeTypes
+import com.twidere.services.mastodon.model.Notification
 import com.twidere.services.mastodon.model.Status
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -33,4 +35,15 @@ interface TimelineResources {
         @Query("limit") limit: Int? = null,
         @Query("local") local: Boolean? = null,
     ): List<Status>
+
+    @JvmSuppressWildcards
+    @GET("/api/v1/notifications")
+    suspend fun notifications(
+        @Query("max_id") max_id: String? = null,
+        @Query("since_id") since_id: String? = null,
+        @Query("min_id") min_id: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("exclude_types[]") exclude_types: List<ExcludeTypes>? = null,
+        @Query("account_id") account_id: String? = null,
+    ): List<Notification>
 }
